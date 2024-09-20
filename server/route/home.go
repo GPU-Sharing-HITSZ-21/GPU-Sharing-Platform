@@ -1,6 +1,7 @@
-package routes
+package route
 
 import (
+	"gpu-sharing-platform/service/home"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,5 +15,9 @@ func HomeRouterInit(router *gin.Engine) {
 				"message": "home",
 			})
 		})
+
+		homeRouter.GET("/time", home.GetIndexInfo)
+
+		homeRouter.GET("/get_test_instance", home.GetTestInstance)
 	}
 }
