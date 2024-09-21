@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.31
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes:
+      # 将主机的路径挂载到容器中的 MySQL 数据存储路径
+      - /var/mysql-docker/data:/var/lib/mysql
+      # 将 SQL 文件挂载到 MySQL 初始化文件目录
+      - ./sql/01_init_db.sql:/docker-entrypoint-initdb.d/01_init_db.sql
+      - ./sql/02_fill_data.sql:/docker-entrypoint-initdb.d/02_fill_data.sql
+    networks:
+      - mysql_network
+
+networks:
+  mysql_network:
+    driver: bridge
