@@ -13,3 +13,16 @@ GORM + MySQL
     ```
     
 2. 查看 ``
+
+
+### kubernetes go
+
+1. 安装
+
+   ```bash
+   go get k8s.io/client-go@v0.26.3
+   go get k8s.io/api@v0.26.3
+   go get k8s.io/apimachinery@v0.26.3
+   ```
+
+   

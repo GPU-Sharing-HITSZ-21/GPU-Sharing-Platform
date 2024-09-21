@@ -1,9 +1,8 @@
 package main
 
 import (
-	"gpu-sharing-platform/route"
-
 	"github.com/gin-gonic/gin"
+	"gpu-sharing-platform/route"
 )
 
 func main() {
@@ -16,6 +15,7 @@ func main() {
 	})
 
 	route.HomeRouterInit(router)
+	route.ContainerRouterInit(router)
 
 	router.Run(":1024")
 }
