@@ -20,3 +20,15 @@ export default defineConfig({
     }
   }
 })
+
+module.exports = {
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:1024', // 后端 API 地址
+        changeOrigin: true,
+        pathRewrite: { '^/api': '' }, // 重写路径
+      },
+    },
+  },
+};

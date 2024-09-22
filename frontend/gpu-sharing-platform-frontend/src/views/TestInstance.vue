@@ -25,7 +25,7 @@ export default {
   methods: {
     async fetchInstances() {
       try {
-        const response = await axios.get('http://localhost:1024/home/get_test_instance');
+        const response = await axios.get('/api/home/get_test_instance');
         this.instances = response.data;
       } catch (error) {
         console.error('Error fetching instances:', error);

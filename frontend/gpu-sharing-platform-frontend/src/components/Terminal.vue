@@ -40,7 +40,7 @@ export default {
 
     // 初始化 WebSocket 连接
     initWebSocket() {
-      this.socket = new WebSocket('ws://localhost:1024/container/terminal');
+      this.socket = new WebSocket('ws://110.40.176.8:1024//container/terminal');
 
       // 处理 WebSocket 消息，显示在终端
       this.socket.onmessage = (event) => {
