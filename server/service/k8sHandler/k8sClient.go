@@ -3,6 +3,7 @@ package k8sHandler
 import (
 	"fmt"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	"os"
@@ -10,6 +11,7 @@ import (
 )
 
 var K8sClient *kubernetes.Clientset
+var K8sConfig *rest.Config
 
 // 初始化时连接到 Kubernetes
 func init() {
@@ -28,12 +30,12 @@ func k8sClientInit() {
 		fmt.Println("未检测到 Kubernetes 配置，跳过 K8s 客户端初始化")
 		return
 	}
-
 	config, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
 	if err != nil {
 		fmt.Println("构建 K8s 配置失败，跳过 K8s 客户端初始化: ", err)
 		return
 	}
+	K8sConfig = config
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		fmt.Println("初始化 K8s 客户端失败: ", err)

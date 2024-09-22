@@ -76,11 +76,11 @@ func HandleExecWebSocket(c *gin.Context) {
 		return
 	}
 
-	restConfig, err := rest.InClusterConfig()
-	if err != nil {
-		wsConn.WriteMessage(websocket.TextMessage, []byte("Failed to get cluster config"))
-		return
-	}
+	//restConfig, err := rest.InClusterConfig()
+	//if err != nil {
+	//	wsConn.WriteMessage(websocket.TextMessage, []byte("Failed to get cluster config"))
+	//	return
+	//}
 
 	// 这里可以初始化一个 Pod 的执行命令的流
 	for {
@@ -92,7 +92,7 @@ func HandleExecWebSocket(c *gin.Context) {
 		}
 
 		// 执行命令
-		output, err := ExecCommandInPod(K8sClient, restConfig, "default", "example-pod", "nginx", []string{"/bin/sh", "-c", string(msg)})
+		output, err := ExecCommandInPod(K8sClient, K8sConfig, "default", "example-pod", "nginx", []string{"/bin/sh", "-c", string(msg)})
 		if err != nil {
 			wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Error: %v", err)))
 			continue
