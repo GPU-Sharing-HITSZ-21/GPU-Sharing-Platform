@@ -14,3 +14,5 @@ cd ../server/ || exit
 go env -w GOPROXY=https://goproxy.cn,direct
 # 下载依赖
 go mod tidy
+
+go run main.go

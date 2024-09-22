@@ -8,6 +8,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
+	"log"
 	"net/http"
 )
 
@@ -68,19 +69,34 @@ func HandleExecWebSocket(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
+
 	restConfig, err := rest.InClusterConfig()
-	command := []string{"/bin/sh"} // 或者 /bin/bash
-	output, err := ExecCommandInPod(K8sClient, restConfig, "default", "example-pod", "nginx", command)
 	if err != nil {
-		err := wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Error: %v", err)))
-		if err != nil {
-			return
-		}
+		wsConn.WriteMessage(websocket.TextMessage, []byte("Failed to get cluster config"))
 		return
 	}
 
-	err = wsConn.WriteMessage(websocket.TextMessage, []byte(output))
-	if err != nil {
-		return
+	// 这里可以初始化一个 Pod 的执行命令的流
+	for {
+		// 读取客户端发送的消息
+		_, msg, err := wsConn.ReadMessage()
+		if err != nil {
+			log.Println("Error reading WebSocket message:", err)
+			break
+		}
+
+		// 执行命令
+		output, err := ExecCommandInPod(K8sClient, restConfig, "default", "example-pod", "nginx", []string{"/bin/sh", "-c", string(msg)})
+		if err != nil {
+			wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("Error: %v", err)))
+			continue
+		}
+
+		// 发送命令输出回客户端
+		err = wsConn.WriteMessage(websocket.TextMessage, []byte(output))
+		if err != nil {
+			fmt.Println("Error writing WebSocket message:", err)
+			break
+		}
 	}
 }
