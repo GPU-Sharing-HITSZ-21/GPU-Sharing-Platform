@@ -70,6 +70,12 @@ func HandleExecWebSocket(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
+	err = wsConn.WriteMessage(websocket.TextMessage, []byte("Welcome to the pod server!"))
+	if err != nil {
+		log.Println("Error writing WebSocket message:", err)
+		return
+	}
+
 	restConfig, err := rest.InClusterConfig()
 	if err != nil {
 		wsConn.WriteMessage(websocket.TextMessage, []byte("Failed to get cluster config"))
@@ -95,7 +101,7 @@ func HandleExecWebSocket(c *gin.Context) {
 		// 发送命令输出回客户端
 		err = wsConn.WriteMessage(websocket.TextMessage, []byte(output))
 		if err != nil {
-			fmt.Println("Error writing WebSocket message:", err)
+			log.Println("Error writing WebSocket message:", err)
 			break
 		}
 	}
