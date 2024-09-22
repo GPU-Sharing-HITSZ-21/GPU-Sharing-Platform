@@ -9,5 +9,6 @@ func ContainerRouterInit(router *gin.Engine) {
 	containerRouter := router.Group("container")
 	{
 		containerRouter.GET("test", k8sHandler.CreateTestPod)
+		containerRouter.GET("terminal", k8sHandler.HandleExecWebSocket)
 	}
 }
