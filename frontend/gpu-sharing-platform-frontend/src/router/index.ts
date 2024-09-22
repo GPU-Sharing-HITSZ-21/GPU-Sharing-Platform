@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import TerminalView from "@/views/TerminalView.vue";
+import TestInstance from "@/views/TestInstance.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,11 @@ const router = createRouter({
       path: '/terminal',
       name: 'terminal',
       component: TerminalView
+    },
+    {
+      path: '/test_instance',
+      name: 'test_instance',
+      component: TestInstance
     }
   ]
 })
