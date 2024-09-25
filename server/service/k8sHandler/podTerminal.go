@@ -76,12 +76,6 @@ func HandleExecWebSocket(c *gin.Context) {
 		return
 	}
 
-	//restConfig, err := rest.InClusterConfig()
-	//if err != nil {
-	//	wsConn.WriteMessage(websocket.TextMessage, []byte("Failed to get cluster config"))
-	//	return
-	//}
-
 	// 这里可以初始化一个 Pod 的执行命令的流
 	for {
 		// 读取客户端发送的消息
