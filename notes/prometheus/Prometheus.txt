@@ -1,0 +1,13 @@
+Prometheus 笔记
+
+1. Kuboard 上部署 Prometheus
+
+Kuboard 地址：http://110.40.176.8:80
+用户名：admin
+密码：Kuboard123
+
+教程：https://blog.csdn.net/qq_36659463/article/details/133125949
+
+
+
+2. Prometheus 相关指令
