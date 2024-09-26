@@ -38,7 +38,7 @@ func CreateTestPod(c *gin.Context) {
 					Name:  "system",
 					Image: requestBody.Image, // 使用输入的镜像名称
 					Command: []string{
-						"/bin/sh", "-c", "apt add --no-cache openssh && /usr/sbin/sshd -D", // 安装 SSH 并启动服务
+						"/bin/sh", "-c", "apt-get update && apt-get install -y openssh-server && /usr/sbin/sshd -D", // 安装 SSH 并启动服务
 					},
 					Ports: []corev1.ContainerPort{
 						{
