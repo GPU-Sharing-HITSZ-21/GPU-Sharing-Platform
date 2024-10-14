@@ -26,7 +26,7 @@ func CreateTestPod(c *gin.Context) {
 	switch requestBody.Image {
 	case "ubuntu":
 		// 使用 ubuntu:20.04 或更高版本，并指定安装 SSH 的命令
-		requestBody.Image = "ubuntu:22.04"
+		requestBody.Image = "ubuntu_ssh:0.0.1-SNAPSHOT"
 		installCommand = []string{
 			"/bin/sh", "-c", "service ssh start && tail -f /dev/null",
 		}
