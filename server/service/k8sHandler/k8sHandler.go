@@ -28,13 +28,13 @@ func CreateTestPod(c *gin.Context) {
 		// 使用 ubuntu:20.04 或更高版本，并指定安装 SSH 的命令
 		requestBody.Image = "ubuntu:22.04"
 		installCommand = []string{
-			"/bin/sh", "-c", "apt-get update && apt-get install -y openssh-server && /usr/sbin/sshd -D",
+			"/bin/sh", "-c", "service ssh start && tail -f /dev/null",
 		}
 	case "centos":
 		// 使用 centos:7 或 centos:8，并指定安装 SSH 的命令
 		requestBody.Image = "centos_ssh:0.0.1-Snap-Shot"
 		installCommand = []string{
-			"/bin/sh", "-c", "yum install -y openssh-server && /usr/sbin/sshd -D",
+			"/bin/sh", "-c", "service ssh start && tail -f /dev/null",
 		}
 	case "alpine":
 		// 使用 alpine，并指定安装 SSH 的命令
