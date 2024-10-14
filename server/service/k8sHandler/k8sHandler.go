@@ -32,7 +32,7 @@ func CreateTestPod(c *gin.Context) {
 		}
 	case "centos":
 		// 使用 centos:7 或 centos:8，并指定安装 SSH 的命令
-		requestBody.Image = "centos:8"
+		requestBody.Image = "centos_ssh:0.0.1-Snap-Shot"
 		installCommand = []string{
 			"/bin/sh", "-c", "yum install -y openssh-server && /usr/sbin/sshd -D",
 		}
