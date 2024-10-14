@@ -22,8 +22,29 @@ func CreateTestPod(c *gin.Context) {
 	}
 
 	// 镜像判断
-	if requestBody.Image != "ubuntu" && requestBody.Image != "centos" && requestBody.Image != "alpine" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Image should be ubuntu,centos,or alpine"})
+	var installCommand []string
+	switch requestBody.Image {
+	case "ubuntu":
+		// 使用 ubuntu:20.04 或更高版本，并指定安装 SSH 的命令
+		requestBody.Image = "ubuntu:22.04"
+		installCommand = []string{
+			"/bin/sh", "-c", "apt-get update && apt-get install -y openssh-server && /usr/sbin/sshd -D",
+		}
+	case "centos":
+		// 使用 centos:7 或 centos:8，并指定安装 SSH 的命令
+		requestBody.Image = "centos:8"
+		installCommand = []string{
+			"/bin/sh", "-c", "yum install -y openssh-server && /usr/sbin/sshd -D",
+		}
+	case "alpine":
+		// 使用 alpine，并指定安装 SSH 的命令
+		requestBody.Image = "alpine:latest"
+		installCommand = []string{
+			"/bin/sh", "-c", "apk add --no-cache openssh && /usr/sbin/sshd -D",
+		}
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Image should be ubuntu, centos, or alpine"})
+		return
 	}
 
 	// 定义 Pod 规范
@@ -35,11 +56,9 @@ func CreateTestPod(c *gin.Context) {
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
 				{
-					Name:  "system",
-					Image: requestBody.Image, // 使用输入的镜像名称
-					Command: []string{
-						"/bin/sh", "-c", "apt-get update && apt-get install -y openssh-server && /usr/sbin/sshd -D", // 安装 SSH 并启动服务
-					},
+					Name:    "system",
+					Image:   requestBody.Image, // 使用输入的镜像名称
+					Command: installCommand,
 					Ports: []corev1.ContainerPort{
 						{
 							ContainerPort: 22,
