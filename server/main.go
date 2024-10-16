@@ -16,6 +16,7 @@ func main() {
 
 	route.HomeRouterInit(router)
 	route.ContainerRouterInit(router)
+	route.UserRouterInit(router)
 
 	router.Run(":1024")
 }
