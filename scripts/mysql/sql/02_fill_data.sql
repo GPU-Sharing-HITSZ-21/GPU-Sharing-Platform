@@ -8,5 +8,5 @@ VALUES
     ('Instance 4', NOW()),
     ('Instance 5', NOW());
 
-INSERT INTO `user` (username, password, role, created_at)
+INSERT INTO `users` (username, password, role, created_at)
 VALUES ('admin_user', 'your_password_here', 'ADMIN', NOW());
