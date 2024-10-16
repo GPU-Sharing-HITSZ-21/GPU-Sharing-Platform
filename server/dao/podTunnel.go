@@ -9,7 +9,7 @@ func InsertPod(pod *models.Pod) (int, error) {
 	if result.Error != nil {
 		return -1, result.Error
 	} else {
-		return pod.Id, nil
+		return int(pod.ID), nil
 	}
 }
 
