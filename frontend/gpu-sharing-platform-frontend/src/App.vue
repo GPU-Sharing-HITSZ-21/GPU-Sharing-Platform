@@ -4,23 +4,19 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
   <RouterView />
 </template>
 
-<style scoped>
+<style>
+body {
+  background-color: #f0f0f0; /* 设置背景颜色 */
+  background-image: url('./assets/background.jpg'); /* 设置背景图像（可选） */
+  background-size: cover; /* 背景图像填充 */
+  background-position: center; /* 背景图像居中 */
+  margin: 0; /* 去掉默认边距 */
+  height: 100vh; /* 设置高度 */
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;

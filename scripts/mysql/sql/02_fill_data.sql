@@ -10,3 +10,7 @@ VALUES
 
 INSERT INTO `users` (username, password, role, created_at)
 VALUES ('admin_user', 'your_password_here', 'ADMIN', NOW());
+
+INSERT INTO `ip_mapping` (public_ip, private_ip) VALUES
+    ('110.40.176.8', '10.0.12.11'),
+    ('124.223.53.29', '10.0.12.15');

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gpu-sharing-platform/dao"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -79,16 +80,22 @@ func CreateTestPod(c *gin.Context) {
 	}
 
 	// 创建对应service
-	CreateSshService(c, pod)
+	CreateSshService(pod)
 
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func CreateSshService(c *gin.Context, createdPod *corev1.Pod) {
+func CreateSshService(createdPod *corev1.Pod) (string, int) {
+	// 申请一个合适的端口
+	portNum, err := dao.ClaimPort()
+	if err != nil {
+		return "null", -1 // 申请端口失败
+	}
+
 	// 定义 Service 规范
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "ssh-service",
+			Name: createdPod.Name + "-ssh-service", // 使用 Pod 名称作为 Service 名称的一部分
 		},
 		Spec: corev1.ServiceSpec{
 			Type: corev1.ServiceTypeNodePort,
@@ -96,40 +103,31 @@ func CreateSshService(c *gin.Context, createdPod *corev1.Pod) {
 				{
 					Port:       22,
 					TargetPort: intstr.FromInt(22),
-					NodePort:   30022, // 指定 NodePort
+					NodePort:   int32(portNum), // 使用申请的端口
 				},
 			},
-			Selector: map[string]string{"app": "ssh-pod"}, // 选择标签
+			Selector: map[string]string{"app": "ssh-pod", "user": createdPod.Labels["user"]}, // 选择标签
 		},
 	}
 
 	// 在默认命名空间创建 Service
-	_, err := K8sClient.CoreV1().Services("default").Create(context.TODO(), service, metav1.CreateOptions{})
+	_, err = K8sClient.CoreV1().Services("default").Create(context.TODO(), service, metav1.CreateOptions{})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": fmt.Sprintf("Failed to create service: %v", err),
-		})
-		return
+		return "null", -1
 	}
 
 	// 等待 Pod 运行状态
 	for {
 		podInfo, err := K8sClient.CoreV1().Pods("default").Get(context.TODO(), createdPod.Name, metav1.GetOptions{})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": fmt.Sprintf("Failed to get pod info: %v", err),
-			})
-			return
+			return "null", -1
 		}
 		if podInfo.Status.Phase == corev1.PodRunning {
 			// 获取节点 IP
 			nodeName := podInfo.Spec.NodeName
 			node, err := K8sClient.CoreV1().Nodes().Get(context.TODO(), nodeName, metav1.GetOptions{})
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"message": fmt.Sprintf("Failed to get node info: %v", err),
-				})
-				return
+				return "null", -1
 			}
 
 			// 通常选择 InternalIP
@@ -140,12 +138,11 @@ func CreateSshService(c *gin.Context, createdPod *corev1.Pod) {
 					break
 				}
 			}
-
-			// 返回 SSH 连接信息
-			c.JSON(http.StatusOK, gin.H{
-				"ssh": fmt.Sprintf("ssh root@%s -p 30022", nodeIP),
-			})
-			return
+			publicIP, err := dao.GetPublicIpByPrivateIp(nodeIP)
+			if err != nil {
+				return "null", -1
+			}
+			return publicIP, portNum
 		}
 
 		// 如果 Pod 还没有运行，稍等再检查

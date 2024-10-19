@@ -37,3 +37,16 @@ func GetPodsByUsername(username string) ([]models.Pod, error) {
 
 	return pods, nil
 }
+
+// GetLatestPodId 查询数据库以获取最新的 Pod ID
+func GetLatestPodId() (int, error) {
+	var latestPod models.Pod
+
+	// 查询数据库，按 ID 降序排序并取出第一条记录
+	result := db.Order("id desc").First(&latestPod)
+	if result.Error != nil {
+		return -1, result.Error // 返回 -1 作为错误标识
+	}
+
+	return int(latestPod.ID), nil
+}

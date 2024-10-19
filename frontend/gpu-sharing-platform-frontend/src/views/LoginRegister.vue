@@ -1,7 +1,7 @@
 <template>
   <div class="auth-container">
     <div class="form-box">
-      <h2>{{ isLogin ? '登录' : '注册' }}</h2>
+      <h2 class="auth-title">{{ isLogin ? '登录' : '注册' }}</h2>
       <form @submit.prevent="isLogin ? handleLogin() : handleRegister()">
         <div class="input-group">
           <label for="username">用户名</label>
@@ -52,7 +52,7 @@ export default {
           username: this.formData.username,
           password: this.formData.password,
         });
-        const { token } = response.data;
+        const {token} = response.data;
         localStorage.setItem("token", token);
         this.$router.push("/home"); // 登录成功后跳转到仪表盘页面
       } catch (error) {
@@ -90,6 +90,11 @@ export default {
   border: 1px solid #ccc;
   border-radius: 8px;
   text-align: center;
+  background-color: rgba(255, 255, 255, 0.9); /* 不透明背景 */
+}
+
+.auth-title {
+  color: #42b983; /* 更改登录文字的颜色 */
 }
 
 .input-group {

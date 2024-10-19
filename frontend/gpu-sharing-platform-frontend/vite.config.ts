@@ -22,7 +22,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:1024', // 后端 API 地址
+        target: 'http://110.40.176.8:1024', // 后端 API 地址
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''), // 去掉 /api 前缀
       },
