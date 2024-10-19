@@ -50,3 +50,12 @@ func GetLatestPodId() (int, error) {
 
 	return int(latestPod.ID), nil
 }
+
+// DeletePod 删除
+func DeletePod(podId int) error {
+	result := db.Delete(&models.Pod{}, podId)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

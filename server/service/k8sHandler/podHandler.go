@@ -159,12 +159,14 @@ func DeletePodByName(c *gin.Context) {
 	// 获取请求参数中的 Pod 名称
 	var requestBody struct {
 		PodName string `json:"podName"`
+		PodId   int    `json:"podId"`
 	}
 	if err := c.ShouldBindJSON(&requestBody); err != nil || requestBody.PodName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
 		return
 	}
 	podName := requestBody.PodName
+	podId := requestBody.PodId
 	// 使用全局锁，确保删除 Pod 的互斥
 	podDeletionMutex.Lock()
 	defer podDeletionMutex.Unlock()
@@ -185,6 +187,9 @@ func DeletePodByName(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Failed to delete service: %v", err)})
 		return
 	}
-
+	err = dao.DeletePod(podId)
+	if err != nil {
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Pod %s and its service %s deleted successfully", podName, serviceName)})
 }

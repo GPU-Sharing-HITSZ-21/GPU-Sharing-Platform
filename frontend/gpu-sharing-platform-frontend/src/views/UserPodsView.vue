@@ -99,13 +99,20 @@ export default {
       const confirmDelete = confirm(`Are you sure you want to delete Pod ${podName}?`);
       if (confirmDelete) {
         try {
-          // 发送 DELETE 请求到 API
-          await axios.post(`/api/container/delete`,{
-            podName: podName
-          });
-          alert(`Pod ${podName} deleted successfully!`);
-          // 重新获取数据以更新列表
-          this.getResponseData();
+          // 找到要删除的 Pod 对象
+          const podToDelete = this.responseList.find(item => item.PodName === podName);
+          if (podToDelete) {
+            // 发送 DELETE 请求到 API
+            await axios.post(`/api/container/delete`, {
+              podName: podToDelete.PodName,
+              podId: podToDelete.ID // 这里使用 podId
+            });
+            alert(`Pod ${podName} deleted successfully!`);
+            // 重新获取数据以更新列表
+            this.getResponseData();
+          } else {
+            alert('Pod not found!');
+          }
         } catch (error) {
           console.error("Error deleting pod:", error);
           alert('Failed to delete Pod!');
