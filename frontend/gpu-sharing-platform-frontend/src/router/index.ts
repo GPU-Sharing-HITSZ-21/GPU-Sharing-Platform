@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import TerminalView from "@/views/TerminalView.vue";
 import TestInstance from "@/views/TestInstance.vue";
 import LoginRegister from "@/views/LoginRegister.vue";
+import UserPodsView from "@/views/UserPodsView.vue";
+import CreatePodView from "@/views/CreatePodView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +36,16 @@ const router = createRouter({
       path: '/auth',
       name: 'auth',
       component: LoginRegister
+    },
+    {
+      path: '/pods',
+      name: 'pods',
+      component: UserPodsView
+    },
+    {
+      path: '/create-pod',
+      name: 'create-pod',
+      component: CreatePodView
     }
   ]
 })

@@ -1,25 +1,45 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView, useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+const isHomeOrLogin = computed(() => {
+  return route.path === '/' || route.path === '/auth';
+});
 </script>
 
 <template>
-  <RouterView />
+  <div :class="{ 'background-image': isHomeOrLogin, 'full-screen': !isHomeOrLogin }">
+    <RouterView />
+  </div>
 </template>
 
 <style>
 body {
+  margin: 0;
+  padding: 0;
+}
+
+.background-image {
   background-color: #f0f0f0; /* 设置背景颜色 */
   background-image: url('./assets/background.jpg'); /* 设置背景图像（可选） */
   background-size: cover; /* 背景图像填充 */
   background-position: center; /* 背景图像居中 */
-  margin: 0; /* 去掉默认边距 */
-  height: 100vh; /* 设置高度 */
+  position: fixed; /* 使用固定定位 */
+  top: 0;
+  left: 0;
+  width: 100%; /* 确保宽度为100% */
+  height: 100%; /* 确保高度为100% */
+}
+
+.full-screen {
+  width: 100%;
+  height: 100%;
 }
 
 header {
   line-height: 1.5;
-  max-height: 100vh;
+  max-height: 0;
 }
 
 .logo {
@@ -29,7 +49,7 @@ header {
 
 nav {
   width: 100%;
-  font-size: 12px;
+  font-size: 0px;
   text-align: center;
   margin-top: 2rem;
 }
@@ -73,7 +93,6 @@ nav a:first-of-type {
     text-align: left;
     margin-left: -1rem;
     font-size: 1rem;
-
     padding: 1rem 0;
     margin-top: 1rem;
   }

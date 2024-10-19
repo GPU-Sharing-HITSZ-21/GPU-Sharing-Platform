@@ -54,7 +54,7 @@ export default {
         });
         const {token} = response.data;
         localStorage.setItem("token", token);
-        this.$router.push("/home"); // 登录成功后跳转到仪表盘页面
+        this.$router.push("/pods"); // 登录成功后跳转到仪表盘页面
       } catch (error) {
         this.errorMessage = error.response?.data?.message || "登录失败";
       }
