@@ -11,6 +11,8 @@ func ContainerRouterInit(router *gin.Engine) {
 		containerRouter.GET("/test", k8sHandler.CreateTestPod)
 		containerRouter.GET("/terminal", k8sHandler.HandleExecWebSocket)
 		containerRouter.POST("/create", k8sHandler.CreatePodByUser)
+		containerRouter.POST("/delete", k8sHandler.DeletePodByName)
 		containerRouter.GET("/myPods", k8sHandler.GetPodByUser)
+
 	}
 }

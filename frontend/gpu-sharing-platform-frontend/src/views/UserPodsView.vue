@@ -28,6 +28,7 @@
         <td>{{ item.UpdatedAt }}</td>
         <td>
           <button @click="getSshLink(item)">Get SSH Link</button> <!-- 新增按钮 -->
+          <button @click="deletePod(item.PodName)">Delete</button> <!-- 删除按钮 -->
         </td>
       </tr>
       </tbody>
@@ -93,6 +94,23 @@ export default {
     createPod() {
       // 使用 vue-router 跳转到新建 Pod 的视图
       this.router.push('/create-pod'); // 替换为新建 Pod 的路由路径
+    },
+    async deletePod(podName) {
+      const confirmDelete = confirm(`Are you sure you want to delete Pod ${podName}?`);
+      if (confirmDelete) {
+        try {
+          // 发送 DELETE 请求到 API
+          await axios.post(`/api/container/delete`,{
+            podName: podName
+          });
+          alert(`Pod ${podName} deleted successfully!`);
+          // 重新获取数据以更新列表
+          this.getResponseData();
+        } catch (error) {
+          console.error("Error deleting pod:", error);
+          alert('Failed to delete Pod!');
+        }
+      }
     }
   }
 };

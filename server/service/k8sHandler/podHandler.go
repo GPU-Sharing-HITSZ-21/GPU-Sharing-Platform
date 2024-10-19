@@ -15,6 +15,7 @@ import (
 
 // 定义一个全局锁
 var podCreationMutex sync.Mutex
+var podDeletionMutex sync.Mutex
 
 // CreatePodByUser 创建一个新的 Pod 并为其配置 SSH 服务
 func CreatePodByUser(c *gin.Context) {
@@ -151,4 +152,33 @@ func GetPodByUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"pods": pods,
 	})
+}
+
+// DeletePodByName 删除指定名称的 Pod 及其对应的 SSH 服务
+func DeletePodByName(c *gin.Context) {
+	// 获取请求参数中的 Pod 名称
+	podName := c.Param("podName")
+
+	// 使用全局锁，确保删除 Pod 的互斥
+	podDeletionMutex.Lock()
+	defer podDeletionMutex.Unlock()
+
+	// 删除 Pod
+	err := K8sClient.CoreV1().Pods("default").Delete(context.TODO(), podName, metav1.DeleteOptions{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Failed to delete pod: %v", err)})
+		return
+	}
+
+	// 构建 SSH Service 名称
+	serviceName := fmt.Sprintf("%s-ssh-service", podName)
+
+	// 删除对应的 SSH Service
+	err = K8sClient.CoreV1().Services("default").Delete(context.TODO(), serviceName, metav1.DeleteOptions{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("Failed to delete service: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Pod %s and its service %s deleted successfully", podName, serviceName)})
 }
