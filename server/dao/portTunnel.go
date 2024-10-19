@@ -34,8 +34,18 @@ func ClaimPort() (int, error) {
 
 // CheckPort 检查指定的端口是否已被占用
 func CheckPort(portNum int) bool {
-	port, err := GetPortByNum(portNum) // 假设有这个函数来根据端口号查找端口
-	return err == nil && port != nil
+	var count int64
+	result := db.Model(&models.Port{}).Where("port_num = ?", portNum).Count(&count)
+
+	if result.Error != nil {
+		// 处理错误
+	}
+
+	if count > 0 {
+		return true
+	} else {
+		return false
+	}
 }
 
 // GetPortByNum 根据端口号查找端口
