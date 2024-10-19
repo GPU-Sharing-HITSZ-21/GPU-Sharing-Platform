@@ -157,8 +157,14 @@ func GetPodByUser(c *gin.Context) {
 // DeletePodByName 删除指定名称的 Pod 及其对应的 SSH 服务
 func DeletePodByName(c *gin.Context) {
 	// 获取请求参数中的 Pod 名称
-	podName := c.Param("podName")
-
+	var requestBody struct {
+		PodName string `json:"podName"`
+	}
+	if err := c.ShouldBindJSON(&requestBody); err != nil || requestBody.PodName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
+		return
+	}
+	podName := requestBody.PodName
 	// 使用全局锁，确保删除 Pod 的互斥
 	podDeletionMutex.Lock()
 	defer podDeletionMutex.Unlock()
