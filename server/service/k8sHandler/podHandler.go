@@ -64,7 +64,7 @@ func CreatePodByUser(c *gin.Context) {
 	}
 
 	// 使用用户名生成 Pod 名称，确保唯一性
-	podName := fmt.Sprintf("%s-ssh-pod-%d", username, latestPodId+1) // 假设 podId 从 1 开始
+	podName := fmt.Sprintf("ssh-pod-%d", latestPodId+1) // 假设 podId 从 1 开始
 
 	// 定义 Pod 规范
 	pod := &corev1.Pod{
