@@ -30,7 +30,7 @@ func GetPodsByUsername(username string) ([]models.Pod, error) {
 	var pods []models.Pod
 
 	// 根据 UserID 查找对应的 Pods
-	result := db.Where("user_name = ?", username).Find(&pods)
+	result := db.Where("username = ?", username).Find(&pods)
 	if result.Error != nil {
 		return nil, result.Error
 	}

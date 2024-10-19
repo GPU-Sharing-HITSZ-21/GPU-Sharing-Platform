@@ -116,3 +116,39 @@ func CreatePodByUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"podID": podID})
 }
+
+// GetPodByUser 根据用户名获取该用户的 Pod 列表，并返回给前端
+func GetPodByUser(c *gin.Context) {
+	// 从 Authorization header 获取 token
+	token := c.Request.Header.Get("Authorization")
+	username, err := utils.GetUsername(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Unauthorized: Invalid token",
+		})
+		return
+	}
+
+	// 通过用户名获取 Pod 列表
+	pods, err := dao.GetPodsByUsername(username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to retrieve pods",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// 如果没有找到任何 Pod
+	if len(pods) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "No pods found for the user",
+		})
+		return
+	}
+
+	// 返回 Pod 列表
+	c.JSON(http.StatusOK, gin.H{
+		"pods": pods,
+	})
+}
