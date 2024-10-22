@@ -32,7 +32,7 @@ func StartTrainingJob(c *gin.Context) {
 
 	// 处理程序名称
 	jobName := sanitizeName(jobRequest.Program)
-
+	log.Printf(jobName)
 	// 创建 Job 对象
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
