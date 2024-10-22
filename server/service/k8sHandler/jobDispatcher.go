@@ -11,11 +11,11 @@ import (
 )
 
 type JobRequest struct {
-	Program   string `json:"program"`
-	Dataset   string `json:"dataset"`
-	UploadDir string `json:"uploadDir"`
-	InputDir  string `json:"inputDir"`
-	OutputDir string `json:"outputDir"`
+	Program   string   `json:"program"`
+	Dataset   []string `json:"dataset"`
+	UploadDir string   `json:"uploadDir"`
+	InputDir  string   `json:"inputDir"`
+	OutputDir string   `json:"outputDir"`
 }
 
 func StartTrainingJob(c *gin.Context) {

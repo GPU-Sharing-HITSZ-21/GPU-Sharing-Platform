@@ -6,7 +6,7 @@
     <input type="file" multiple @change="onDatasetChange" />
 
     <h3>上传运行程序</h3>
-    <input type="file" multiple @change="onProgramChange" />
+    <input type="file" @change="onProgramChange" /> <!-- 只允许上传一个程序 -->
 
     <h3>输入目录</h3>
     <input v-model="inputDir" placeholder="输入目录" />
@@ -22,8 +22,8 @@
 export default {
   data() {
     return {
-      selectedDatasets: [], // 改为数组以支持多个数据集
-      selectedPrograms: [],  // 改为数组以支持多个程序
+      selectedDatasets: [], // 数组以支持多个数据集
+      selectedProgram: null, // 单个程序
       inputDir: '',
       outputDir: ''
     };
@@ -33,10 +33,10 @@ export default {
       this.selectedDatasets = Array.from(event.target.files); // 转换为数组
     },
     onProgramChange(event) {
-      this.selectedPrograms = Array.from(event.target.files); // 转换为数组
+      this.selectedProgram = event.target.files[0]; // 只获取第一个文件
     },
     async uploadFilesAndRun() {
-      if (this.selectedDatasets.length === 0 || this.selectedPrograms.length === 0 || !this.inputDir || !this.outputDir) {
+      if (this.selectedDatasets.length === 0 || !this.selectedProgram || !this.inputDir || !this.outputDir) {
         alert('请填写所有字段！');
         return;
       }
@@ -48,9 +48,7 @@ export default {
       });
 
       const programFormData = new FormData();
-      this.selectedPrograms.forEach(file => {
-        programFormData.append('files', file); // 使用 'files' 作为字段名
-      });
+      programFormData.append('file', this.selectedProgram); // 只上传一个程序
 
       try {
         // 上传数据集
@@ -87,7 +85,7 @@ export default {
             'Authorization': this.getToken()
           },
           body: JSON.stringify({
-            program: this.selectedPrograms.map(file => file.name), // 运行程序的文件名数组
+            program: this.selectedProgram.name, // 只获取一个程序的文件名
             dataset: this.selectedDatasets.map(file => file.name), // 数据集名称数组
             uploadDir: this.getUploadDir(), // 上传目录
             inputDir: this.inputDir, // 数据集存储路径
