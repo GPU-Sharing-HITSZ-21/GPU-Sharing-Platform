@@ -51,5 +51,8 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,     // 返回用户名
+		"role":  user.Role, // 返回用户角色
+	})
 }

@@ -52,8 +52,9 @@ export default {
           username: this.formData.username,
           password: this.formData.password,
         });
-        const {token} = response.data;
+        const {token, role} = response.data; // 提取角色信息
         localStorage.setItem("token", token);
+        localStorage.setItem("role", role); // 保存角色信息
         this.$router.push("/pods"); // 登录成功后跳转到仪表盘页面
       } catch (error) {
         this.errorMessage = error.response?.data?.message || "登录失败";

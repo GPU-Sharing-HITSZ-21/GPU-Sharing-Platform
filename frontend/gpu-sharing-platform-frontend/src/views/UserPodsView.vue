@@ -3,7 +3,10 @@
     <h2>
       Pod List
       <button @click="createPod" class="create-pod-button">新建 Pod</button>
-      <button @click="goToJobView" class="job-view-button">查看作业</button> <!-- 新增按钮 -->
+      <button @click="goToJobView" class="job-view-button">查看作业</button>
+      <!-- 仅当角色为 ADMIN 时显示的按钮 -->
+      <button v-if="isAdmin" @click="manageUsers" class="manage-users-button">管理用户</button>
+      <button v-if="isAdmin" @click="viewLogs" class="view-logs-button">查看日志</button>
     </h2>
     <table>
       <thead>
@@ -15,7 +18,7 @@
         <th>Port Number</th>
         <th>Created At</th>
         <th>Updated At</th>
-        <th>Action</th> <!-- 新增 Action 列 -->
+        <th>Action</th>
       </tr>
       </thead>
       <tbody>
@@ -28,14 +31,13 @@
         <td>{{ item.CreatedAt }}</td>
         <td>{{ item.UpdatedAt }}</td>
         <td>
-          <button @click="getSshLink(item)">Get SSH Link</button> <!-- 新增按钮 -->
-          <button @click="deletePod(item.PodName)">Delete</button> <!-- 删除按钮 -->
+          <button @click="getSshLink(item)">Get SSH Link</button>
+          <button @click="deletePod(item.PodName)">Delete</button>
         </td>
       </tr>
       </tbody>
     </table>
 
-    <!-- 模态框 -->
     <div v-if="isModalVisible" class="modal">
       <div class="modal-content">
         <span class="close" @click="closeModal">&times;</span>
@@ -49,39 +51,42 @@
 
 <script>
 import axios from 'axios';
-import { useRouter } from 'vue-router'; // 导入 vue-router
+import { useRouter } from 'vue-router';
 
 export default {
   data() {
     return {
-      responseList: [], // 存储从API获取的数据
-      isModalVisible: false, // 控制模态框的显示
-      sshLink: '', // 存储当前 SSH 链接
-      router: null // 存储路由实例
+      responseList: [],
+      isModalVisible: false,
+      sshLink: '',
+      router: null,
+      isAdmin: false, // 新增属性判断用户是否为管理员
     };
   },
   mounted() {
-    this.router = useRouter(); // 获取路由实例
-    this.getResponseData(); // 发送请求获取数据
+    this.router = useRouter();
+    this.getResponseData();
+    this.checkUserRole(); // 检查用户角色
   },
   methods: {
     async getResponseData() {
       try {
-        // 发送GET请求到API
         const response = await axios.get('/api/container/myPods');
-        // 将返回的 pods 数据赋值给 responseList
         this.responseList = response.data.pods;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
+    checkUserRole() {
+      const role = localStorage.getItem("role"); // 从 localStorage 获取角色
+      this.isAdmin = (role === 'ADMIN'); // 判断是否为管理员
+    },
     getSshLink(item) {
-      // 在这里处理 SSH 链接的逻辑
       this.sshLink = `ssh root@${item.ssh_address} -p ${item.port_num}`;
-      this.isModalVisible = true; // 显示模态框
+      this.isModalVisible = true;
     },
     closeModal() {
-      this.isModalVisible = false; // 关闭模态框
+      this.isModalVisible = false;
     },
     copyToClipboard() {
       navigator.clipboard.writeText(this.sshLink)
@@ -93,27 +98,22 @@ export default {
           });
     },
     createPod() {
-      // 使用 vue-router 跳转到新建 Pod 的视图
-      this.router.push('/create-pod'); // 替换为新建 Pod 的路由路径
+      this.router.push('/create-pod');
     },
     goToJobView() {
-      // 跳转到 Job View
-      this.router.push('/job'); // 替换为 Job View 的路由路径
+      this.router.push('/job');
     },
     async deletePod(podName) {
       const confirmDelete = confirm(`Are you sure you want to delete Pod ${podName}?`);
       if (confirmDelete) {
         try {
-          // 找到要删除的 Pod 对象
           const podToDelete = this.responseList.find(item => item.PodName === podName);
           if (podToDelete) {
-            // 发送 DELETE 请求到 API
             await axios.post(`/api/container/delete`, {
               podName: podToDelete.PodName,
-              podId: podToDelete.ID // 这里使用 podId
+              podId: podToDelete.ID
             });
             alert(`Pod ${podName} deleted successfully!`);
-            // 重新获取数据以更新列表
             this.getResponseData();
           } else {
             alert('Pod not found!');
@@ -123,7 +123,15 @@ export default {
           alert('Failed to delete Pod!');
         }
       }
-    }
+    },
+    manageUsers() {
+      // 跳转到用户管理页面
+      this.router.push('/manage-users'); // 替换为用户管理的路由路径
+    },
+    viewLogs() {
+      // 跳转到日志查看页面
+      this.router.push('/view-logs'); // 替换为查看日志的路由路径
+    },
   }
 };
 </script>
