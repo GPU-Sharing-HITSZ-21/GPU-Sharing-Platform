@@ -14,11 +14,13 @@ import (
 )
 
 type JobRequest struct {
-	Program   string   `json:"program"`
+	Program   string   `json:"program"` // ZIP 文件中可执行文件的名称
 	Dataset   []string `json:"dataset"`
 	UploadDir string   `json:"uploadDir"`
 	InputDir  string   `json:"inputDir"`
 	OutputDir string   `json:"outputDir"`
+	ZIP       int      `json:"zip"` // 是否为 ZIP 文件
+	ZIPName   string   `json:"zipName"`
 }
 
 func StartTrainingJob(c *gin.Context) {
@@ -40,69 +42,145 @@ func StartTrainingJob(c *gin.Context) {
 	}
 
 	uploadDir := jobRequest.UploadDir + username
-	// 容器内program路径
-	//programDir := jobRequest.InputDir + jobRequest.Program
-
-	// 处理程序名称
 	jobName := sanitizeName(jobRequest.Program)
-	log.Printf(jobName)
-	// 创建 Job 对象
-	job := &batchv1.Job{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: jobName, // 使用程序名称作为 Job 名称
-		},
-		Spec: batchv1.JobSpec{
-			Template: corev1.PodTemplateSpec{
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{
-						{
-							Name:  jobName,
-							Image: "continuumio/miniconda3", // 容器镜像
-							Args:  []string{"python", "/data/" + jobRequest.Program},
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      "data-volume",       // Volume 名称
-									MountPath: jobRequest.InputDir, // 容器内路径
+	log.Printf("Job name: %s", jobName)
+
+	var job *batchv1.Job
+
+	// 根据 ZIP 字段决定创建不同的 Job
+	if jobRequest.ZIP == 1 {
+		// 创建解压并执行的 Job
+		job = &batchv1.Job{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: jobName,
+			},
+			Spec: batchv1.JobSpec{
+				Template: corev1.PodTemplateSpec{
+					Spec: corev1.PodSpec{
+						Containers: []corev1.Container{
+							{
+								Name:  jobName,
+								Image: "continuumio/miniconda3",
+								Args: []string{
+									"sh", "-c",
+									"unzip -o /data/zip/" + jobRequest.ZIPName + " -d /data && cd /data && chmod +x " + jobRequest.Program + " && python ./" + jobRequest.Program,
 								},
-								{
-									Name:      "output-volume",      // opt 名称
-									MountPath: jobRequest.OutputDir, // 容器内路径
-								},
-							},
-						},
-					},
-					RestartPolicy: corev1.RestartPolicyNever,
-					Volumes: []corev1.Volume{
-						{
-							Name: "data-volume",
-							VolumeSource: corev1.VolumeSource{
-								HostPath: &corev1.HostPathVolumeSource{
-									Path: uploadDir, // 上传的目录路径
-								},
-							},
-						},
-						{
-							Name: "output-volume",
-							VolumeSource: corev1.VolumeSource{
-								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/trainingOpt", // 输出目录路径
+								VolumeMounts: []corev1.VolumeMount{
+									{
+										Name:      "data-volume",
+										MountPath: jobRequest.InputDir,
+									},
+									{
+										Name:      "output-volume",
+										MountPath: jobRequest.OutputDir,
+									},
+									{
+										Name:      "zip-volume",
+										MountPath: "/data/zip",
+									},
 								},
 							},
 						},
-					},
-					NodeSelector: map[string]string{
-						"node-role.kubernetes.io/master": "", // 选择 master 节点
-					},
-					Tolerations: []corev1.Toleration{
-						{
-							Key:      "node-role.kubernetes.io/master",
-							Operator: corev1.TolerationOpExists,
-							Effect:   corev1.TaintEffectNoSchedule,
+						RestartPolicy: corev1.RestartPolicyNever,
+						Volumes: []corev1.Volume{
+							{
+								Name: "data-volume",
+								VolumeSource: corev1.VolumeSource{
+									HostPath: &corev1.HostPathVolumeSource{
+										Path: uploadDir,
+									},
+								},
+							},
+							{
+								Name: "output-volume",
+								VolumeSource: corev1.VolumeSource{
+									HostPath: &corev1.HostPathVolumeSource{
+										Path: "/trainingOpt",
+									},
+								},
+							},
+							{
+								Name: "zip-volume",
+								VolumeSource: corev1.VolumeSource{
+									HostPath: &corev1.HostPathVolumeSource{
+										Path: uploadDir + "/" + jobRequest.Dataset[0], // ZIP 文件路径
+									},
+								},
+							},
+						},
+						NodeSelector: map[string]string{
+							"node-role.kubernetes.io/master": "",
+						},
+						Tolerations: []corev1.Toleration{
+							{
+								Key:      "node-role.kubernetes.io/master",
+								Operator: corev1.TolerationOpExists,
+								Effect:   corev1.TaintEffectNoSchedule,
+							},
 						},
 					},
 				},
 			},
-		},
+		}
+	} else {
+		// 创建直接执行的 Job
+		job = &batchv1.Job{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: jobName,
+			},
+			Spec: batchv1.JobSpec{
+				Template: corev1.PodTemplateSpec{
+					Spec: corev1.PodSpec{
+						Containers: []corev1.Container{
+							{
+								Name:  jobName,
+								Image: "continuumio/miniconda3",
+								Args:  []string{"python", "/data/" + jobRequest.Program},
+								VolumeMounts: []corev1.VolumeMount{
+									{
+										Name:      "data-volume",
+										MountPath: jobRequest.InputDir,
+									},
+									{
+										Name:      "output-volume",
+										MountPath: jobRequest.OutputDir,
+									},
+								},
+							},
+						},
+						RestartPolicy: corev1.RestartPolicyNever,
+						Volumes: []corev1.Volume{
+							{
+								Name: "data-volume",
+								VolumeSource: corev1.VolumeSource{
+									HostPath: &corev1.HostPathVolumeSource{
+										Path: uploadDir,
+									},
+								},
+							},
+							{
+								Name: "output-volume",
+								VolumeSource: corev1.VolumeSource{
+									HostPath: &corev1.HostPathVolumeSource{
+										Path: "/trainingOpt",
+									},
+								},
+							},
+						},
+						NodeSelector: map[string]string{
+							"node-role.kubernetes.io/master": "",
+						},
+						Tolerations: []corev1.Toleration{
+							{
+								Key:      "node-role.kubernetes.io/master",
+								Operator: corev1.TolerationOpExists,
+								Effect:   corev1.TaintEffectNoSchedule,
+							},
+						},
+					},
+				},
+			},
+		}
 	}
 
 	// 创建 Job
@@ -119,16 +197,10 @@ func StartTrainingJob(c *gin.Context) {
 
 // sanitizeName 函数将输入名称转换为有效的 Kubernetes 名称
 func sanitizeName(name string) string {
-	// 去掉扩展名
 	name = strings.TrimSuffix(name, ".py")
-
-	// 转换为小写
+	name = strings.TrimSuffix(name, ".zip")
 	name = strings.ToLower(name)
-
-	// 使用正则表达式替换不符合要求的字符
 	re := regexp.MustCompile("[^a-z0-9-]")
 	name = re.ReplaceAllString(name, "-")
-
-	// 返回处理后的名称
 	return name
 }
