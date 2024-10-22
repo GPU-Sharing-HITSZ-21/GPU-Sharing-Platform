@@ -3,6 +3,7 @@ package k8sHandler
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"gpu-sharing-platform/utils"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,12 +24,24 @@ type JobRequest struct {
 func StartTrainingJob(c *gin.Context) {
 	var jobRequest JobRequest
 
+	// 获取请求头中的 JWT token 并解析出用户名
+	token := c.Request.Header.Get("Authorization")
+	username, err := utils.GetUsername(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized: Invalid token"})
+		return
+	}
+
 	// 解析请求体
 	if err := c.ShouldBindJSON(&jobRequest); err != nil {
 		log.Printf("请求数据解析失败: %v", err) // 打印错误日志
 		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求数据"})
 		return
 	}
+
+	uploadDir := jobRequest.UploadDir + username
+	// 容器内program路径
+	programDir := jobRequest.InputDir + jobRequest.Program
 
 	// 处理程序名称
 	jobName := sanitizeName(jobRequest.Program)
@@ -45,7 +58,7 @@ func StartTrainingJob(c *gin.Context) {
 						{
 							Name:  jobName,
 							Image: "continuumio/miniconda3", // 容器镜像
-							Args:  []string{"python", jobRequest.Program},
+							Args:  []string{"python", programDir},
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "data-volume",       // Volume 名称
@@ -64,7 +77,7 @@ func StartTrainingJob(c *gin.Context) {
 							Name: "data-volume",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: jobRequest.UploadDir, // 上传的目录路径
+									Path: uploadDir, // 上传的目录路径
 								},
 							},
 						},
