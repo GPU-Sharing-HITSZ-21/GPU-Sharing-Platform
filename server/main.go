@@ -18,6 +18,7 @@ func main() {
 	route.ContainerRouterInit(router)
 	route.UserRouterInit(router)
 	route.FileRouterInit(router)
+	route.JobRouterInit(router)
 
 	err := router.Run(":1024")
 	if err != nil {
