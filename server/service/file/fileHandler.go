@@ -21,7 +21,7 @@ func HandleFileUpload(c *gin.Context) {
 	log.Printf("用户名: %s\n", username)
 
 	// 创建用户目录
-	userDir := filepath.Join("/uploads/", username)
+	userDir := filepath.Join("~/uploads/", username)
 
 	// 打印用户目录日志
 	log.Printf("用户目录: %s\n", userDir)

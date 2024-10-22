@@ -106,7 +106,7 @@ export default {
       return localStorage.getItem('username');
     },
     getUploadDir(){
-      return '/uploads/'+this.getUsername()
+      return '~/uploads/'+this.getUsername()
     }
   }
 };
