@@ -65,7 +65,7 @@ func StartTrainingJob(c *gin.Context) {
 									"sh", "-c",
 									"apt-get update && apt-get install -y unzip && " +
 										"unzip -o /data/" + jobRequest.ZIPName + " -d /data && " +
-										"cd /data && chmod +x " + jobRequest.Program + " && " +
+										"cd /data/lab1 && chmod +x " + jobRequest.Program + " && " +
 										"python ./" + jobRequest.Program,
 								},
 								VolumeMounts: []corev1.VolumeMount{
