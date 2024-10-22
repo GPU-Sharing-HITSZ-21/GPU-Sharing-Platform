@@ -5,8 +5,8 @@
       <button @click="createPod" class="create-pod-button">新建 Pod</button>
       <button @click="goToJobView" class="job-view-button">查看作业</button>
       <!-- 仅当角色为 ADMIN 时显示的按钮 -->
-      <button v-if="isAdmin" @click="manageUsers" class="manage-users-button">管理用户</button>
-      <button v-if="isAdmin" @click="viewLogs" class="view-logs-button">查看日志</button>
+      <button v-if="isAdmin" @click="kuboard" class="kuboard">kuboard</button>
+      <button v-if="isAdmin" @click="promethues" class="promethues">promethues</button>
     </h2>
     <table>
       <thead>
@@ -124,14 +124,13 @@ export default {
         }
       }
     },
-    manageUsers() {
-      // 跳转到用户管理页面
-      this.router.push('/manage-users'); // 替换为用户管理的路由路径
+    kuboard() {
+      window.open('http://110.40.176.8', '_blank');
     },
-    viewLogs() {
-      // 跳转到日志查看页面
-      this.router.push('/view-logs'); // 替换为查看日志的路由路径
+    promethues() {
+      window.open('http://110.40.176.8:30128/', '_blank');
     },
+
   }
 };
 </script>
