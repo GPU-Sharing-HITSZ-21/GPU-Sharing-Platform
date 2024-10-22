@@ -60,7 +60,7 @@ func StartTrainingJob(c *gin.Context) {
 						Containers: []corev1.Container{
 							{
 								Name:  jobName,
-								Image: "continuumio/miniconda3",
+								Image: "miniconda-unzip:0.0.1-SNAPSHOT",
 								Args: []string{
 									"sh", "-c",
 									"apt-get update && apt-get install -y unzip && " +
