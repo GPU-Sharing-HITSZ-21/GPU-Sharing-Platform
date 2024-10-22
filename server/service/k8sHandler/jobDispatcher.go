@@ -96,7 +96,7 @@ func StartTrainingJob(c *gin.Context) {
 	}
 
 	// 创建 Job
-	_, err := K8sClient.BatchV1().Jobs("default").Create(context.Background(), job, metav1.CreateOptions{})
+	_, err = K8sClient.BatchV1().Jobs("default").Create(context.Background(), job, metav1.CreateOptions{})
 	if err != nil {
 		log.Printf("创建训练任务失败: %v", err) // 打印错误日志
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法创建训练任务"})
