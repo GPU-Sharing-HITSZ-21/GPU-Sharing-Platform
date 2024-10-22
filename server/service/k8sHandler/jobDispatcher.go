@@ -63,7 +63,10 @@ func StartTrainingJob(c *gin.Context) {
 								Image: "continuumio/miniconda3",
 								Args: []string{
 									"sh", "-c",
-									"unzip -o /data/zip/" + jobRequest.ZIPName + " -d /data && cd /data && chmod +x " + jobRequest.Program + " && python ./" + jobRequest.Program,
+									"apt-get update && apt-get install -y unzip && " +
+										"unzip -o /data/zip/" + jobRequest.ZIPName + " -d /data && " +
+										"cd /data && chmod +x " + jobRequest.Program + " && " +
+										"python ./" + jobRequest.Program,
 								},
 								VolumeMounts: []corev1.VolumeMount{
 									{
