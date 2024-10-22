@@ -3,10 +3,10 @@
     <h2>上传数据集和运行程序</h2>
 
     <h3>上传数据集</h3>
-    <input type="file" @change="onDatasetChange" />
+    <input type="file" multiple @change="onDatasetChange" />
 
     <h3>上传运行程序</h3>
-    <input type="file" @change="onProgramChange" />
+    <input type="file" multiple @change="onProgramChange" />
 
     <h3>输入目录</h3>
     <input v-model="inputDir" placeholder="输入目录" />
@@ -22,30 +22,35 @@
 export default {
   data() {
     return {
-      selectedDataset: null,
-      selectedProgram: null,
-      inputDir: '', // 新增 inputDir
+      selectedDatasets: [], // 改为数组以支持多个数据集
+      selectedPrograms: [],  // 改为数组以支持多个程序
+      inputDir: '',
       outputDir: ''
     };
   },
   methods: {
     onDatasetChange(event) {
-      this.selectedDataset = event.target.files[0];
+      this.selectedDatasets = Array.from(event.target.files); // 转换为数组
     },
     onProgramChange(event) {
-      this.selectedProgram = event.target.files[0];
+      this.selectedPrograms = Array.from(event.target.files); // 转换为数组
     },
     async uploadFilesAndRun() {
-      if (!this.selectedDataset || !this.selectedProgram || !this.inputDir || !this.outputDir) {
+      if (this.selectedDatasets.length === 0 || this.selectedPrograms.length === 0 || !this.inputDir || !this.outputDir) {
         alert('请填写所有字段！');
         return;
       }
 
+      // 创建 FormData 对象
       const datasetFormData = new FormData();
-      datasetFormData.append('file', this.selectedDataset);
+      this.selectedDatasets.forEach(file => {
+        datasetFormData.append('files', file); // 使用 'files' 作为字段名
+      });
 
       const programFormData = new FormData();
-      programFormData.append('file', this.selectedProgram);
+      this.selectedPrograms.forEach(file => {
+        programFormData.append('files', file); // 使用 'files' 作为字段名
+      });
 
       try {
         // 上传数据集
@@ -82,9 +87,9 @@ export default {
             'Authorization': this.getToken()
           },
           body: JSON.stringify({
-            program: this.selectedProgram.name, // 运行程序的文件名
-            dataset: this.selectedDataset.name, //数据集名称
-            uploadDir: this.getUploadDir(), //上传目录
+            program: this.selectedPrograms.map(file => file.name), // 运行程序的文件名数组
+            dataset: this.selectedDatasets.map(file => file.name), // 数据集名称数组
+            uploadDir: this.getUploadDir(), // 上传目录
             inputDir: this.inputDir, // 数据集存储路径
             outputDir: this.outputDir // 输出目录
           })
@@ -105,8 +110,8 @@ export default {
     getUsername() {
       return localStorage.getItem('username');
     },
-    getUploadDir(){
-      return '/uploads/'+this.getUsername()
+    getUploadDir() {
+      return '/uploads/' + this.getUsername();
     }
   }
 };

@@ -43,9 +43,11 @@ func HandleFileUpload(c *gin.Context) {
 	}
 
 	files := form.File["files"] // 使用 "files" 作为表单字段名
-
+	log.Printf("保存")
 	// 保存每个文件到用户目录
 	for _, file := range files {
+		// 打印文件名
+		log.Printf("收到文件: %s\n", file.Filename)
 		if err := c.SaveUploadedFile(file, filepath.Join(userDir, file.Filename)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "保存文件失败"})
 			return
