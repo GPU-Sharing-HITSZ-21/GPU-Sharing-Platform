@@ -8,6 +8,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log" // 导入日志包
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 type JobRequest struct {
@@ -28,6 +30,9 @@ func StartTrainingJob(c *gin.Context) {
 		return
 	}
 
+	// 处理程序名称
+	jobName := sanitizeName(jobRequest.Program)
+
 	// 创建 Job 对象
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -38,9 +43,9 @@ func StartTrainingJob(c *gin.Context) {
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  jobRequest.Program,
+							Name:  jobName,
 							Image: "continuumio/miniconda3", // 容器镜像
-							Args:  []string{},
+							Args:  []string{"python", jobRequest.Program},
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "data-volume",       // Volume 名称
@@ -87,4 +92,20 @@ func StartTrainingJob(c *gin.Context) {
 
 	log.Printf("训练任务已启动: %+v", jobRequest) // 打印成功日志
 	c.JSON(http.StatusOK, gin.H{"message": "训练任务已启动", "jobDetails": jobRequest})
+}
+
+// sanitizeName 函数将输入名称转换为有效的 Kubernetes 名称
+func sanitizeName(name string) string {
+	// 去掉扩展名
+	name = strings.TrimSuffix(name, ".py")
+
+	// 转换为小写
+	name = strings.ToLower(name)
+
+	// 使用正则表达式替换不符合要求的字符
+	re := regexp.MustCompile("[^a-z0-9-]")
+	name = re.ReplaceAllString(name, "-")
+
+	// 返回处理后的名称
+	return name
 }
