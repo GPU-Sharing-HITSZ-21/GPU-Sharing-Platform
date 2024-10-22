@@ -3,6 +3,7 @@ package file
 import (
 	"github.com/gin-gonic/gin"
 	"gpu-sharing-platform/utils"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,7 +19,10 @@ func HandleFileUpload(c *gin.Context) {
 	}
 
 	// 创建用户目录
-	userDir := filepath.Join("./uploads", username)
+	userDir := filepath.Join("./uploads/", username)
+
+	// 打印用户目录日志
+	log.Printf("用户目录: %s\n", userDir)
 
 	// 检查目录是否存在
 	if _, err := os.Stat(userDir); os.IsNotExist(err) {

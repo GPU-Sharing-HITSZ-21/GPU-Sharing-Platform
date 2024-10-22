@@ -5,6 +5,7 @@ import TestInstance from "@/views/TestInstance.vue";
 import LoginRegister from "@/views/LoginRegister.vue";
 import UserPodsView from "@/views/UserPodsView.vue";
 import CreatePodView from "@/views/CreatePodView.vue";
+import FileView from "@/views/FileView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,11 @@ const router = createRouter({
       path: '/create-pod',
       name: 'create-pod',
       component: CreatePodView
+    },
+    {
+      path: '/fileupload',
+      name: 'fileupload',
+      component: FileView
     }
   ]
 })
