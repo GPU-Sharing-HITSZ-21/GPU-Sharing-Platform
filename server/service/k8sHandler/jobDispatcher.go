@@ -137,7 +137,7 @@ func StartTrainingJob(c *gin.Context) {
 						Containers: []corev1.Container{
 							{
 								Name:  jobName,
-								Image: "continuumio/miniconda3",
+								Image: "miniconda-unzip:0.0.1-SNAPSHOT",
 								Args:  []string{"python", "/data/" + jobRequest.Program},
 								VolumeMounts: []corev1.VolumeMount{
 									{
