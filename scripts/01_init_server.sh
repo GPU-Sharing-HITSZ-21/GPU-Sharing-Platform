@@ -151,4 +151,14 @@ cat > /etc/cni/net.d/cni-default.conf << EOF
 EOF
 echo "cni配置完成"
 
+echo "创建文件上传目录"
+mkdir /uploads
+chmod 777 /uploads
+echo "创建文件上传目录完成"
+
+echo "创建文件输出目录"
+mkdir /trainingOpt
+chmod 777 /trainingOpt
+echo "创建文件输出目录完成"
+
 echo "所有操作已完成。请检查系统状态。"

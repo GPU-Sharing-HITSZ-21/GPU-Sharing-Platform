@@ -35,17 +35,21 @@ func HandleFileUpload(c *gin.Context) {
 		}
 	}
 
-	// 读取上传的文件
-	file, err := c.FormFile("file")
+	// 读取上传的多个文件
+	form, err := c.MultipartForm()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "文件上传失败"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "获取文件失败"})
 		return
 	}
 
-	// 保存文件到用户目录
-	if err := c.SaveUploadedFile(file, filepath.Join(userDir, file.Filename)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "保存文件失败"})
-		return
+	files := form.File["files"] // 使用 "files" 作为表单字段名
+
+	// 保存每个文件到用户目录
+	for _, file := range files {
+		if err := c.SaveUploadedFile(file, filepath.Join(userDir, file.Filename)); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "保存文件失败"})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "文件上传成功"})
