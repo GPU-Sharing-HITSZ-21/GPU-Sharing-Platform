@@ -93,6 +93,13 @@ func StartTrainingJob(c *gin.Context) {
 					NodeSelector: map[string]string{
 						"node-role.kubernetes.io/master": "", // 选择 master 节点
 					},
+					Tolerations: []corev1.Toleration{
+						{
+							Key:      "node-role.kubernetes.io/master",
+							Operator: corev1.TolerationOpExists,
+							Effect:   corev1.TaintEffectNoSchedule,
+						},
+					},
 				},
 			},
 		},
