@@ -3,6 +3,7 @@
     <h2>
       Pod List
       <button @click="createPod" class="create-pod-button">新建 Pod</button>
+      <button @click="goToJobView" class="job-view-button">查看作业</button> <!-- 新增按钮 -->
     </h2>
     <table>
       <thead>
@@ -95,6 +96,10 @@ export default {
       // 使用 vue-router 跳转到新建 Pod 的视图
       this.router.push('/create-pod'); // 替换为新建 Pod 的路由路径
     },
+    goToJobView() {
+      // 跳转到 Job View
+      this.router.push('/job'); // 替换为 Job View 的路由路径
+    },
     async deletePod(podName) {
       const confirmDelete = confirm(`Are you sure you want to delete Pod ${podName}?`);
       if (confirmDelete) {
@@ -164,7 +169,8 @@ tbody tr:nth-child(even) {
 }
 
 /* 新建 Pod 按钮样式 */
-.create-pod-button {
+.create-pod-button,
+.job-view-button {
   margin-left: 20px; /* 添加左边距 */
   padding: 5px 10px; /* 添加内边距 */
   background-color: #2c3e50; /* 按钮背景色 */
@@ -174,7 +180,8 @@ tbody tr:nth-child(even) {
   cursor: pointer; /* 鼠标指针样式 */
 }
 
-.create-pod-button:hover {
+.create-pod-button:hover,
+.job-view-button:hover {
   background-color: #34495e; /* 悬停时背景色 */
 }
 
