@@ -63,8 +63,7 @@ func StartTrainingJob(c *gin.Context) {
 								Image: "miniconda-unzip:0.0.1-SNAPSHOT",
 								Args: []string{
 									"sh", "-c",
-									"apt-get update && apt-get install -y unzip && " +
-										"unzip -o /data/" + jobRequest.ZIPName + " -d /data && " +
+									"find /data -name 'lab1.zip' -exec unzip -o {} -d /data \\; && " +
 										"cd /data/lab1 && chmod +x " + jobRequest.Program + " && " +
 										"python ./" + jobRequest.Program,
 								},
