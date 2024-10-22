@@ -103,7 +103,7 @@ func StartTrainingJob(c *gin.Context) {
 								Name: "zip-volume",
 								VolumeSource: corev1.VolumeSource{
 									HostPath: &corev1.HostPathVolumeSource{
-										Path: uploadDir + "/" + jobRequest.Dataset[0], // ZIP 文件路径
+										Path: uploadDir + "/" + jobRequest.ZIPName, // ZIP 文件路径
 									},
 								},
 							},
