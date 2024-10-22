@@ -6,6 +6,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"log" // 导入日志包
 	"net/http"
 )
 
@@ -22,6 +23,7 @@ func StartTrainingJob(c *gin.Context) {
 
 	// 解析请求体
 	if err := c.ShouldBindJSON(&jobRequest); err != nil {
+		log.Printf("请求数据解析失败: %v", err) // 打印错误日志
 		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求数据"})
 		return
 	}
@@ -56,7 +58,6 @@ func StartTrainingJob(c *gin.Context) {
 						{
 							Name: "data-volume",
 							VolumeSource: corev1.VolumeSource{
-								// 替换为实际的 Volume 类型
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: jobRequest.UploadDir, // 上传的目录路径
 								},
@@ -65,7 +66,6 @@ func StartTrainingJob(c *gin.Context) {
 						{
 							Name: "output-volume",
 							VolumeSource: corev1.VolumeSource{
-								// 替换为实际的 Volume 类型
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: "/trainingOpt", // 输出目录路径
 								},
@@ -76,11 +76,15 @@ func StartTrainingJob(c *gin.Context) {
 			},
 		},
 	}
+
 	// 创建 Job
 	_, err := K8sClient.BatchV1().Jobs("default").Create(context.Background(), job, metav1.CreateOptions{})
 	if err != nil {
+		log.Printf("创建训练任务失败: %v", err) // 打印错误日志
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法创建训练任务"})
 		return
 	}
+
+	log.Printf("训练任务已启动: %+v", jobRequest) // 打印成功日志
 	c.JSON(http.StatusOK, gin.H{"message": "训练任务已启动", "jobDetails": jobRequest})
 }
