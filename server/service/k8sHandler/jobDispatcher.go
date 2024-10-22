@@ -64,7 +64,7 @@ func StartTrainingJob(c *gin.Context) {
 								Args: []string{
 									"sh", "-c",
 									"apt-get update && apt-get install -y unzip && " +
-										"unzip -o /data/zip/" + jobRequest.ZIPName + " -d /data && " +
+										"unzip -o /data/" + jobRequest.ZIPName + " -d /data && " +
 										"cd /data && chmod +x " + jobRequest.Program + " && " +
 										"python ./" + jobRequest.Program,
 								},
