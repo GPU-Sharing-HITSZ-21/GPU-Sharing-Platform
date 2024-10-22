@@ -41,7 +41,7 @@ func StartTrainingJob(c *gin.Context) {
 
 	uploadDir := jobRequest.UploadDir + username
 	// 容器内program路径
-	programDir := jobRequest.InputDir + jobRequest.Program
+	//programDir := jobRequest.InputDir + jobRequest.Program
 
 	// 处理程序名称
 	jobName := sanitizeName(jobRequest.Program)
@@ -58,7 +58,7 @@ func StartTrainingJob(c *gin.Context) {
 						{
 							Name:  jobName,
 							Image: "continuumio/miniconda3", // 容器镜像
-							Args:  []string{"python", programDir},
+							Args:  []string{"python", "/data/" + jobRequest.Program},
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "data-volume",       // Volume 名称
