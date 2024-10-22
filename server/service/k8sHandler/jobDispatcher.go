@@ -36,7 +36,7 @@ func StartTrainingJob(c *gin.Context) {
 	// 创建 Job 对象
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: jobRequest.Program, // 使用程序名称作为 Job 名称
+			Name: jobName, // 使用程序名称作为 Job 名称
 		},
 		Spec: batchv1.JobSpec{
 			Template: corev1.PodTemplateSpec{
