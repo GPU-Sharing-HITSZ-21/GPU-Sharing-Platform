@@ -37,7 +37,7 @@ func StartTrainingJob(c *gin.Context) {
 					Containers: []corev1.Container{
 						{
 							Name:  jobRequest.Program,
-							Image: "", // 容器镜像
+							Image: "continuumio/miniconda3", // 容器镜像
 							Args:  []string{},
 							VolumeMounts: []corev1.VolumeMount{
 								{
