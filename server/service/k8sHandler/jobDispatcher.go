@@ -90,6 +90,9 @@ func StartTrainingJob(c *gin.Context) {
 							},
 						},
 					},
+					NodeSelector: map[string]string{
+						"node-role.kubernetes.io/master": "", // 选择 master 节点
+					},
 				},
 			},
 		},
