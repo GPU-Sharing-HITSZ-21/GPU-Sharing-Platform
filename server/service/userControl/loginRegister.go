@@ -32,6 +32,7 @@ func RegisterUser(c *gin.Context) {
 }
 
 // LoginUser 处理用户登录
+// todo : 返回值和data封装
 func LoginUser(c *gin.Context) {
 	var loginUser models.User
 	if err := c.ShouldBindJSON(&loginUser); err != nil {
@@ -52,7 +53,7 @@ func LoginUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,     // 返回用户名
-		"role":  user.Role, // 返回用户角色
+		"token": token,
+		"role":  user.Role,
 	})
 }

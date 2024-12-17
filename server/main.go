@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"gpu-sharing-platform/route"
+	"github.com/gin-contrib/cors"
 )
 
 func main() {
