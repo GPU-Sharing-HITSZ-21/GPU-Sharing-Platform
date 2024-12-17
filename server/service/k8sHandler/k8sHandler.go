@@ -106,7 +106,7 @@ func CreateSshService(createdPod *corev1.Pod) (string, int) {
 					NodePort:   int32(portNum), // 使用申请的端口
 				},
 			},
-			Selector: map[string]string{"app": "ssh-pod", "user": createdPod.Labels["user"]}, // 选择标签
+			Selector: map[string]string{"app": "custom-pod", "user": createdPod.Labels["user"],"podName":createdPod.Labels["podName"]}, // 选择标签
 		},
 	}
 
@@ -138,11 +138,11 @@ func CreateSshService(createdPod *corev1.Pod) (string, int) {
 					break
 				}
 			}
-			publicIP, err := dao.GetPublicIpByPrivateIp(nodeIP)
-			if err != nil {
-				return "null", -1
-			}
-			return publicIP, portNum
+			// publicIP, err := dao.GetPublicIpByPrivateIp(nodeIP)
+			// if err != nil {
+			// 	return "null", -1
+			// }
+			return nodeIP, portNum
 		}
 
 		// 如果 Pod 还没有运行，稍等再检查
