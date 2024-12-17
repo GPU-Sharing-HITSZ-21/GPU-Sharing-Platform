@@ -20,7 +20,7 @@ func main() {
 	route.FileRouterInit(router)
 	route.JobRouterInit(router)
 
-	err := router.Run(":1024")
+	err := router.Run(":31024")
 	if err != nil {
 		// todo 告警
 		return
