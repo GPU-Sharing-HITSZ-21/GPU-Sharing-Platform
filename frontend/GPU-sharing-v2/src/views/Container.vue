@@ -117,13 +117,36 @@ const confirmClick = async () => {
 
 const copyToClipboard = (sshAddress) => {
   // Use the Clipboard API to copy the SSH address to the clipboard
-  navigator.clipboard.writeText(sshAddress)
-      .then(() => {
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(sshAddress)
+        .then(() => {
+          ElMessage.success('SSH address copied to clipboard!');
+        })
+        .catch((error) => {
+          ElMessage.error(`Failed to copy: ${error.message}`);
+        });
+  }else{
+    // 兼容不支持 Clipboard API 的情况（HTTP环境）
+    const textArea = document.createElement('textarea');
+    textArea.value = sshAddress;
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    try {
+      // 尝试使用 execCommand 来复制
+      const successful = document.execCommand('copy');
+      if (successful) {
         ElMessage.success('SSH address copied to clipboard!');
-      })
-      .catch((error) => {
-        ElMessage.error(`Failed to copy: ${error.message}`);
-      });
+      } else {
+        ElMessage.error('Failed to copy using execCommand.');
+      }
+    } catch (error) {
+      ElMessage.error(`Error: ${error.message}`);
+    }
+
+    // 移除临时创建的 textarea 元素
+    document.body.removeChild(textArea);
+  }
 };
 
 </script>
