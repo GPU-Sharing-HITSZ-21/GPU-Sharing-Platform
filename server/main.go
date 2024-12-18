@@ -11,7 +11,7 @@ func main() {
 
 	//cros配置
 	router.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"http://localhost:5173"}, // 允许的源，可以根据需要添加多个源
+        AllowOrigins:     []string{"http://localhost:5173","http://10.249.190.219:35173"}, // 允许的源，可以根据需要添加多个源
         AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"}, // 允许的 HTTP 方法
         AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // 允许的请求头
         ExposeHeaders:    []string{"Content-Length", "Authorization"}, // 允许客户端获取的响应头

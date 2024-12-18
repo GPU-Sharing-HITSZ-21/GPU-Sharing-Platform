@@ -18,7 +18,7 @@ const form = reactive({
 
 const drawer = ref(false)
 const direction = ref('rtl')
-const worker = ref('master')
+const worker = ref('node-1')
 const gpu = ref('0');
 const memory = ref(2048);
 const diskSize = ref(20);
@@ -185,7 +185,7 @@ const copyToClipboard = (sshAddress) => {
 
         <el-form-item label="Select Worker">
           <el-radio-group v-model="worker" size="large">
-            <el-radio label="master">master</el-radio>
+            <el-radio label="master" disabled>master</el-radio>
             <el-radio label="node-1">node-1</el-radio>
           </el-radio-group>
         </el-form-item>
